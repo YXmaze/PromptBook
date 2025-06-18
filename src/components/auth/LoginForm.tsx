@@ -2,6 +2,7 @@
 import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
 import { auth, provider } from "@/lib/firebase";
 import { useRouter } from "next/navigation";
+import { createUserIfNotExists } from "../../app/actions/createUser";
 
 export default function LoginForm() {
   const router = useRouter();
@@ -9,8 +10,14 @@ export default function LoginForm() {
   const handleLogin = async () => {
     try {
       const provider = new GoogleAuthProvider();
-      await signInWithPopup(auth, provider);
+      const result = await signInWithPopup(auth, provider);
       router.push("/");
+
+      await createUserIfNotExists({
+        id: result.user.uid,
+        email: result.user.email ?? "",
+        name: result.user.displayName,
+      });
     } catch (err) {
       console.error("Login failed:", err);
     }

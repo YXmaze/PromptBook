@@ -3,9 +3,12 @@ import LogoutButton from "@/components/auth/LogoutButton";
 
 export default function Home() {
   return (
-    <main className="flex justify-center items-center h-screen">
-      <HomePage />
-      <LogoutButton />
-    </main>
+    <>
+      <main className="flex justify-center items-center h-screen">
+        <HomePage />
+        <LogoutButton />
+        <button className="p-4">CreateCell</button>
+      </main>
+    </>
   );
 }

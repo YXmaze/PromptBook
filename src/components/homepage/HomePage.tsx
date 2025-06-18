@@ -26,11 +26,13 @@ export default function HomePage() {
   }
 
   return (
-    <main className="p-8">
-      <h1 className="text-2xl font-bold mb-2">
-        Welcome, {user.displayName || "User"}!
-      </h1>
-      <p className="text-gray-600">This is your mock dashboard 👋</p>
-    </main>
+    <>
+      <main className="p-8">
+        <h1 className="text-2xl font-bold mb-2">
+          Welcome, {user.displayName || "User"}!
+        </h1>
+        <p className="text-gray-600">This is your mock dashboard 👋</p>
+      </main>
+    </>
   );
 }
