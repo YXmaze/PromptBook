@@ -1,21 +1,20 @@
-# 1. Base image
+# 1. ใช้ Node base image
 FROM node:20-alpine
 
-# 2. Set working directory
+# 2. ตั้ง working directory
 WORKDIR /app
 
-# 3. Copy dependency files
+# 3. คัดลอก dependencies
 COPY package.json package-lock.json* ./
 
-# 4. Install dependencies
+# 4. ติดตั้ง
 RUN npm install
 
-# 5. Copy all project files
+# 5. คัดลอกไฟล์ทั้งหมด
 COPY . .
 
-# 6. Build Next.js
-RUN npm run build
-
-# 7. Expose port & start
+# 6. เปิด hot reload
 EXPOSE 3000
-CMD ["npm", "start"]
+
+# 7. สั่งรัน dev server
+CMD ["npm", "run", "dev"]
