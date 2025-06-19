@@ -7,7 +7,6 @@ export default function Home() {
       <main className="flex justify-center items-center h-screen">
         <HomePage />
         <LogoutButton />
-        <button className="p-4">CreateCell</button>
       </main>
     </>
   );
