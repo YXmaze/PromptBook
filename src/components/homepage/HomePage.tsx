@@ -4,7 +4,6 @@ import { useEffect, useState } from "react";
 import { onAuthStateChanged, User } from "firebase/auth";
 import { auth } from "@/lib/firebase";
 import { useRouter } from "next/navigation";
-import { Button } from "@/components/ui/button";
 import {
   Sheet,
   SheetClose,
@@ -39,31 +38,10 @@ export default function HomePage() {
 
   return (
     <main className="p-8">
-      <Sheet>
-        <SheetTrigger asChild>
-          <PanelLeft />
-        </SheetTrigger>
-        <SheetContent side="left">
-          <div className="flex justify-end">
-            <SheetClose asChild>
-              <PanelLeft />
-            </SheetClose>
-          </div>
-          <SheetHeader>
-            <SheetTitle>Are you absolutely sure?</SheetTitle>
-            <SheetDescription>
-              This action cannot be undone. This will permanently delete your
-              account and remove your data from our servers.
-            </SheetDescription>
-          </SheetHeader>
-        </SheetContent>
-      </Sheet>
-      <div>
-        <h1 className="text-2xl font-bold mb-2">
-          Welcome, {user.displayName || "User"}!
-        </h1>
-        <p className="text-gray-600">This is your mock dashboard 👋</p>
-      </div>
+      <h1 className="text-2xl font-bold mb-2">
+        Welcome, {user.displayName || "User"}!
+      </h1>
+      <p className="text-gray-600">This is your mock dashboard 👋</p>
     </main>
   );
 }
