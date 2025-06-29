@@ -3,32 +3,38 @@
 import { PrismaClient } from "../../generated/prisma";
 const prisma = new PrismaClient();
 
-interface CreateCellParams {
+interface CreateCellWithExistCollectionParams {
   userId: string;
   collectionId: string;
-  position: number;
   prompt?: string | null;
   result?: string | null;
   review?: string | null;
 }
 
-export async function createCell({
+export async function createCellWithExistCollection({
   userId,
   collectionId,
-  position,
   prompt = null,
   result = null,
   review = null,
-}: CreateCellParams) {
-  const cell = await prisma.cell.create({
+}: CreateCellWithExistCollectionParams) {
+  // Get the next position number
+  const cellCount = await prisma.cell.count({
+    where: {
+      collectionId,
+    },
+  });
+
+  const newCell = await prisma.cell.create({
     data: {
       userId,
       collectionId,
-      position,
+      position: cellCount,
       prompt,
       result,
       review,
     },
   });
-  return cell;
+
+  return newCell;
 }
