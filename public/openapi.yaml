@@ -1,0 +1,628 @@
+openapi: 3.0.3
+info:
+  title: PromptBook API
+  version: 1.0.0
+  description: API specification for PromptBook backend (users, collections, cells)
+
+servers:
+  - url: /api
+
+paths:
+  /users:
+    post:
+      summary: Create user if not exists
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - id
+                - email
+              properties:
+                id:
+                  type: string
+                  description: Unique user ID
+                email:
+                  type: string
+                  format: email
+                name:
+                  type: string
+                  nullable: true
+      responses:
+        "201":
+          description: User created or returned successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        "400":
+          description: Missing required fields
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /collections:
+    get:
+      summary: Get all collections for a user
+      parameters:
+        - in: query
+          name: userId
+          schema:
+            type: string
+          required: true
+          description: User ID to fetch collections for
+      responses:
+        "200":
+          description: List of collections
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Collection"
+        "400":
+          description: Missing userId parameter
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+    post:
+      summary: Create a new collection with auto-generated name
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - userId
+              properties:
+                userId:
+                  type: string
+                  description: User ID for whom to create the collection
+      responses:
+        "201":
+          description: Collection created successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Collection"
+        "400":
+          description: Missing userId field
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /collections/search:
+    get:
+      summary: Search collections for a user by query
+      parameters:
+        - in: query
+          name: userId
+          schema:
+            type: string
+          required: true
+          description: User ID to search collections for
+        - in: query
+          name: query
+          schema:
+            type: string
+          required: false
+          description: Search string (optional)
+      responses:
+        "200":
+          description: Search results for collections
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Collection"
+        "400":
+          description: Missing userId parameter
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /collections/{id}:
+    get:
+      summary: Get a single collection by ID including its cells
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+          required: true
+          description: Collection ID
+      responses:
+        "200":
+          description: Collection with cells returned
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CollectionWithCells"
+        "404":
+          description: Collection not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+    put:
+      summary: Update collection name
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+          required: true
+          description: Collection ID
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - name
+              properties:
+                name:
+                  type: string
+      responses:
+        "200":
+          description: Updated collection
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Collection"
+        "400":
+          description: Missing name in request body
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+    delete:
+      summary: Delete collection and all its cells
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+          required: true
+          description: Collection ID
+      responses:
+        "200":
+          description: Collection deleted successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Deleted
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /cells:
+    get:
+      summary: Get all cell positions for a collection
+      parameters:
+        - in: query
+          name: collectionId
+          schema:
+            type: string
+          required: true
+          description: Collection ID to get cells for
+      responses:
+        "200":
+          description: List of cells with positions
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Cell"
+        "400":
+          description: Missing collectionId parameter
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /cells/exist-collection:
+    post:
+      summary: Create a new cell within an existing collection
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - userId
+                - collectionId
+              properties:
+                userId:
+                  type: string
+                collectionId:
+                  type: string
+                prompt:
+                  type: string
+                  nullable: true
+                result:
+                  type: string
+                  nullable: true
+                review:
+                  type: string
+                  nullable: true
+      responses:
+        "201":
+          description: Cell created successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Cell"
+        "400":
+          description: Missing userId or collectionId
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /cells/new-collection:
+    post:
+      summary: Create a new cell with a new collection auto-created
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - userId
+              properties:
+                userId:
+                  type: string
+      responses:
+        "201":
+          description: Cell and new collection created successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Cell"
+        "400":
+          description: Missing userId field
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /cells/{id}:
+    get:
+      summary: Get a single cell by ID
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+          required: true
+          description: Cell ID
+      responses:
+        "200":
+          description: Cell returned successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Cell"
+        "404":
+          description: Cell not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+    put:
+      summary: Update entire cell by ID
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+          required: true
+          description: Cell ID
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CellUpdate"
+      responses:
+        "200":
+          description: Cell updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Cell"
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+    patch:
+      summary: Update a single field of a cell by ID
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+          required: true
+          description: Cell ID
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - field
+                - value
+              properties:
+                field:
+                  type: string
+                  description: Field name to update (e.g. "prompt", "result", "review", "position")
+                value:
+                  type: string
+                  description: New value for the field
+      responses:
+        "200":
+          description: Cell field updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Cell"
+        "400":
+          description: Missing cellId or field
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+    delete:
+      summary: Delete a cell by ID
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+          required: true
+          description: Cell ID
+      responses:
+        "200":
+          description: Cell deleted successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Deleted
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /cells/reorder:
+    post:
+      summary: Reorder cells within a collection
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - cellId
+                - newIndex
+              properties:
+                cellId:
+                  type: string
+                newIndex:
+                  type: integer
+                  minimum: 0
+      responses:
+        "200":
+          description: Reorder success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+        "400":
+          description: Missing or invalid cellId or newIndex
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: Cell not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+components:
+  schemas:
+    User:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Unique user ID
+        email:
+          type: string
+          format: email
+        name:
+          type: string
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
+
+    Collection:
+      type: object
+      properties:
+        id:
+          type: string
+        userId:
+          type: string
+        name:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+
+    CollectionWithCells:
+      allOf:
+        - $ref: "#/components/schemas/Collection"
+        - type: object
+          properties:
+            cells:
+              type: array
+              items:
+                $ref: "#/components/schemas/Cell"
+
+    Cell:
+      type: object
+      properties:
+        id:
+          type: string
+        userId:
+          type: string
+        collectionId:
+          type: string
+        prompt:
+          type: string
+          nullable: true
+        result:
+          type: string
+          nullable: true
+        review:
+          type: string
+          nullable: true
+        position:
+          type: integer
+        createdAt:
+          type: string
+          format: date-time
+
+    CellUpdate:
+      type: object
+      properties:
+        prompt:
+          type: string
+          nullable: true
+        result:
+          type: string
+          nullable: true
+        review:
+          type: string
+          nullable: true
+        position:
+          type: integer
+
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
