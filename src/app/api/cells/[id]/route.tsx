@@ -1,8 +1,31 @@
 import { NextResponse } from "next/server";
-import { updateCellField } from "@/app/server/updateCellField";
 import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
+
+const allowedFields = ["prompt", "result", "review", "position"] as const;
+type AllowedField = (typeof allowedFields)[number];
+
+async function updateCellField({
+  cellId,
+  field,
+  value,
+}: {
+  cellId: string;
+  field: string;
+  value: any;
+}) {
+  if (!allowedFields.includes(field as AllowedField)) {
+    throw new Error(`Invalid field name: ${field}`);
+  }
+
+  const dataToUpdate = { [field]: value };
+
+  return prisma.cell.update({
+    where: { id: cellId },
+    data: dataToUpdate,
+  });
+}
 
 export async function PATCH(
   req: Request,
@@ -24,6 +47,14 @@ export async function PATCH(
     return NextResponse.json(updatedCell, { status: 200 });
   } catch (error) {
     console.error("Update cell error:", error);
+
+    if (
+      error instanceof Error &&
+      error.message.startsWith("Invalid field name")
+    ) {
+      return NextResponse.json({ error: error.message }, { status: 400 });
+    }
+
     return NextResponse.json(
       { error: "Internal Server Error" },
       { status: 500 }
