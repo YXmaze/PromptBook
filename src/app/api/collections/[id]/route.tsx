@@ -52,10 +52,10 @@ export async function DELETE(
   context: { params: Promise<{ id: string }> }
 ) {
   try {
-    const params = await context.params; // Await here
+    const params = await context.params;
     const { id } = params;
 
-    await prisma.cell.deleteMany({ where: { collectionId: id } }); // optional if onDelete: Cascade is set
+    await prisma.cell.deleteMany({ where: { collectionId: id } });
     await prisma.collection.delete({ where: { id } });
 
     return NextResponse.json({ message: "Deleted" });
