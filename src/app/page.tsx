@@ -1,4 +1,3 @@
-import HomePage from "@/components/homepage/HomePage";
 import LogoutButton from "@/components/auth/LogoutButton";
 import Sidebar from "@/components/homepage/SideBar";
 import Cell from "@/components/homepage/Cell";
