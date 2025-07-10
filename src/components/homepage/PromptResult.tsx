@@ -57,7 +57,7 @@ export default function PromptResult({onDelete}: PromptResultProps) {
     }, []);
 
     return (
-        <div className="w-screen max-w-none bg-[#F4F3EF] shadow-sm rounded-md p-2 relative">
+        <div className="w-full bg-[#F4F3EF] shadow-sm rounded-md p-2 relative">
             {/* Icons at top right */}
             <div className="absolute top-1 right-2 flex items-center">
                 <button 

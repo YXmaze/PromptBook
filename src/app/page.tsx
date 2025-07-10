@@ -21,7 +21,7 @@ export default function Home({ children }: { children: React.ReactNode }) {
           </div>
 
           {/* MAIN CONTENT */}
-          <div className="flex-1 flex justify-center items-center px-4">
+          <div className="flex-1 flex justify-center items-start px-4">
             <Cell />
           </div>
         </div>
