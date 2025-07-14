@@ -55,44 +55,42 @@ export default function Review({ onDelete }: ReviewProps) {
 
   return (
     <div className="w-full bg-[#F4F3EF] shadow-sm rounded-md p-2 relative" draggable>
-      <div className="w-full p-2 bg-[#E5DFD8] rounded-md border border-black">
-        <div className="flex items-center justify-between">
-          <div className="text-sm text-gray-900/70">review :</div>
-          {/* Icons at top right */}
-          <div className="flex items-center">
-            {reviewMarkdown && (
-              <button
-                onClick={toggleEditMode}
-                className="p-1 rounded-full hover:bg-gray-300 transition transform cursor-pointer"
-              >
-                {isEditing ? (
-                  <Check className="text-gray-900/70 size-5" />
-                ) : (
-                  <Pencil className="text-gray-900/70 size-4.5" />
-                )}
-              </button>
-            )}
+      <div className="flex justify-end mb-2">
+        <div className="flex items-center space-x-1">
+          {reviewMarkdown && (
             <button
-              onClick={handleTrashClick}
-              className="p-1 rounded-full hover:bg-gray-300 transition transform cursor-pointer"
-            > 
-              <Trash2 className="text-gray-900/70 size-4.5" />
-            </button>
-            <button
-              onClick={toggleReviewVisibility}
+              onClick={toggleEditMode}
               className="p-1 rounded-full hover:bg-gray-300 transition transform cursor-pointer"
             >
-              <ChevronDown
-                className={`text-gray-900/70 size-5 transition-transform duration-200 ${
-                  isReviewVisible ? "rotate-0" : "rotate-180"
-                }`}
-              />
+              {isEditing ? (
+                <Check className="text-gray-900/70 size-5" />
+              ) : (
+                <Pencil className="text-gray-900/70 size-4.5" />
+              )}
             </button>
-          </div>
+          )}
+          <button
+            onClick={handleTrashClick}
+            className="p-1 rounded-full hover:bg-gray-300 transition transform cursor-pointer"
+          >
+            <Trash2 className="text-gray-900/70 size-4.5" />
+          </button>
+          <button
+            onClick={toggleReviewVisibility}
+            className="p-1 rounded-full hover:bg-gray-300 transition transform cursor-pointer"
+          >
+            <ChevronDown
+              className={`text-gray-900/70 size-5 transition-transform duration-200 ${
+                isReviewVisible ? "rotate-0" : "rotate-180"
+              }`}
+            />
+          </button>
         </div>
-        {isReviewVisible && (
-          <div className="ml-2">
-            {isEditing ? (
+      </div>
+      {isReviewVisible && (
+        <div className="ml-2">
+          {isEditing ? (
+            <div className="w-full p-2 bg-[#E5DFD8] rounded-md border border-black">
               <textarea
                 ref={reviewRef}
                 className="w-full bg-transparent text-base text-black outline-none resize-none"
@@ -104,18 +102,16 @@ export default function Review({ onDelete }: ReviewProps) {
                 }}
                 placeholder="Enter markdown here (e.g., **bold**, *italic*, [link](url))..."
               ></textarea>
-            ) : (
-              <div className="bg-transparent rounded-md">
-                <div className="prose prose-sm text-black">
-                  <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                    {reviewMarkdown || "Preview will appear here..."}
-                  </ReactMarkdown>
-                </div>
-              </div>
-            )}
-          </div>
-        )}
-      </div>
+            </div>
+          ) : (
+            <div className="prose prose-sm text-black">
+              <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                {reviewMarkdown || "Preview will appear here..."}
+              </ReactMarkdown>
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 }
